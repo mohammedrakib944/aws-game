@@ -13,7 +13,7 @@ function MapView() {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
 
-  const { setLocation } = useGameContext();
+  const { setLocation, setLoadingLocation } = useGameContext();
 
   useEffect(() => {
     const map = new Map({
@@ -60,21 +60,28 @@ function MapView() {
       setLocation(address.details.name || address.formatted);
     });
 
-    // Handle map clicks
     map.on("singleclick", async (event) => {
+      setLoadingLocation(true); // Start loading
       const coordinates = toLonLat(event.coordinate); // Convert map projection to lon/lat
       const [lon, lat] = coordinates;
 
       // Reverse Geocoding API Call
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lon=${lon}&lat=${lat}`
-      );
-      const data = await response.json();
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lon=${lon}&lat=${lat}`
+        );
+        const data = await response.json();
 
-      // Extract and display location name
-      if (data && data.display_name) {
-        setLocation(data.display_name);
-        markerRef.current.setPosition(event.coordinate);
+        // Extract and display location name
+        if (data && data.display_name) {
+          setLocation(data.display_name);
+          markerRef.current.setPosition(event.coordinate);
+        }
+      } catch (error) {
+        console.error("Error fetching location:", error);
+        setLocation("Failed to fetch location");
+      } finally {
+        setLoadingLocation(false);
       }
     });
 
