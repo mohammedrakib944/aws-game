@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ol-attribution.ol-unselectable.ol-control.ol-uncollapsible {
+  display: none;
+}
+
+* {
+  font-family: "Play", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.play-bold {
+  font-family: "Play", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.top-shadow {
+  box-shadow: 0 -9px 60px rgb(0 0 0 / 31%);
+}
