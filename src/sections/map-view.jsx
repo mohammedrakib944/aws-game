@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import "ol/ol.css"; // OpenLayers styles
-import "ol-geocoder/dist/ol-geocoder.min.css"; // Geocoder styles
-import { Map, View } from "ol";
-import { Tile as TileLayer } from "ol/layer";
-import { OSM } from "ol/source";
+import { Map, Overlay, View } from "ol";
 import Geocoder from "ol-geocoder";
+import "ol-geocoder/dist/ol-geocoder.min.css";
+import { Tile as TileLayer } from "ol/layer";
+import "ol/ol.css";
 import { fromLonLat, toLonLat } from "ol/proj";
-import { Overlay } from "ol";
+import { OSM } from "ol/source";
+import { useEffect, useRef } from "react";
 import { useGameContext } from "../context/game-context";
 
 function MapView() {
@@ -24,12 +23,11 @@ function MapView() {
         }),
       ],
       view: new View({
-        center: fromLonLat([0, 0]), // Center of the map [longitude, latitude]
+        center: fromLonLat([0, 0]),
         zoom: 2,
       }),
     });
 
-    // Create a marker element
     const marker = document.createElement("div");
     marker.className = "marker";
     markerRef.current = new Overlay({
@@ -38,11 +36,10 @@ function MapView() {
     });
     map.addOverlay(markerRef.current);
 
-    // Add the geocoder
     const geocoder = new Geocoder("nominatim", {
       provider: "osm",
       lang: "en",
-      placeholder: "Search for a place...",
+      placeholder: "Search for a country...",
       limit: 5,
       debug: false,
       autoComplete: true,
@@ -50,36 +47,42 @@ function MapView() {
     });
     map.addControl(geocoder);
 
-    // Handle geocoder search results
+    // Handle geocoder results for countries only
     geocoder.on("addresschosen", (event) => {
       const { coordinate, address } = event;
-      map.getView().animate({ center: coordinate, zoom: 10 });
-      markerRef.current.setPosition(coordinate);
 
-      // Set the location name in state
-      setLocation(address.details.name || address.formatted);
+      // Check if the result is a country
+      if (address.details && address.details.type === "country") {
+        map.getView().animate({ center: coordinate, zoom: 5 });
+        markerRef.current.setPosition(coordinate);
+        setLocation(address.formatted); // Set country name in state
+      } else {
+        alert("Please select a valid country.");
+      }
     });
 
+    // Handle map click for reverse geocoding
     map.on("singleclick", async (event) => {
-      setLoadingLocation(true); // Start loading
-      const coordinates = toLonLat(event.coordinate); // Convert map projection to lon/lat
+      setLoadingLocation(true);
+      const coordinates = toLonLat(event.coordinate);
       const [lon, lat] = coordinates;
 
-      // Reverse Geocoding API Call
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lon=${lon}&lat=${lat}`
         );
         const data = await response.json();
 
-        // Extract and display location name
-        if (data && data.display_name) {
-          setLocation(data.display_name);
+        if (data && data.address && data.address.country) {
+          const country = data.address.country;
+          setLocation(country);
           markerRef.current.setPosition(event.coordinate);
+        } else {
+          alert("Please click within a valid country.");
         }
       } catch (error) {
-        console.error("Error fetching location:", error);
-        setLocation("Failed to fetch location");
+        console.error("Error fetching country data:", error);
+        setLocation("Failed to fetch country");
       } finally {
         setLoadingLocation(false);
       }
@@ -88,7 +91,6 @@ function MapView() {
     return () => {
       map.setTarget(null);
     };
-    console.log("HI");
   }, []);
 
   return (
