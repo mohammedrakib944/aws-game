@@ -1,14 +1,11 @@
 import React from "react";
-import MapView from "./sections/map-view";
-import GameContainer from "./sections/game-container";
+import Home from "./pages/Home";
 
 const App = () => {
   return (
-    <div className="relative">
-      <MapView />
-      <GameContainer />
+    <div>
+      <Home/>
     </div>
   );
 };
-
 export default App;
