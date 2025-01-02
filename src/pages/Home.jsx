@@ -14,7 +14,7 @@ const Home = () => {
         <div className='h-3/4 flex justify-center items-center'>
             <div className='border bg-slate-100 border-slate-800 p-10 rounded-tr-3xl rounded-bl-3xl'>
                 <h1 className='text-4xl'>
-                    Start Game
+                    Hide & Seek
                 </h1>
             </div>
         </div>
