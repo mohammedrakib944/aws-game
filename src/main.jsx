@@ -1,13 +1,29 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import "./index.css";
 import App from "./app.jsx";
 import GameContextProvider from "./context/game-context.jsx";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import Home from "./pages/Home.jsx";
+import Game from './pages/Game.jsx';
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <GameContextProvider>
-      <App />
-    </GameContextProvider>
-  </StrictMode>
+const router = createBrowserRouter([
+  {  
+    path: "/",
+    element: <Home/>
+  },
+  {
+    path: "/game",
+    element: <Game/>
+  }
+])
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+      <GameContextProvider>
+        <RouterProvider router={router}>
+          <App />
+        </RouterProvider>
+      </GameContextProvider>
+  </React.StrictMode>
 );
