@@ -1,10 +1,10 @@
-import React from "react";
 import Home from "./pages/Home";
 
 const App = () => {
   return (
     <div>
-      <Home/>
+      <h2>Awesome</h2>
+      <Home />
     </div>
   );
 };

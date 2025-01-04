@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .input {
+    @apply outline-none border px-4 py-2 rounded-md focus-within:shadow focus-within:border-primary;
+  }
+}
+
 .ol-attribution.ol-unselectable.ol-control.ol-uncollapsible {
   display: none;
 }

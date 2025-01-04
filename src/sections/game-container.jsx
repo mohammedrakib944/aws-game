@@ -1,4 +1,3 @@
-import React from "react";
 import SelectLocation from "../components/select-location";
 
 const GameContainer = () => {
