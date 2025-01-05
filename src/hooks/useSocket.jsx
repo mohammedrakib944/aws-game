@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import io from "socket.io-client";
 
 export const API_BASE_URL = "http://localhost:8000";
@@ -6,17 +7,20 @@ export const API_BASE_URL = "http://localhost:8000";
 export const socket = io(API_BASE_URL);
 
 const useSocket = () => {
-  const [players, setPlayers] = useState([]);
+  const navigate = useNavigate();
+  const [roomInfo, setRoomInfo] = useState([]);
+
   // const [countrySelector, setCountrySelector] = useState("");
   // const [country, setCountry] = useState("");
   // const [hint, setHint] = useState("");
   // const [hintsReceived, setHintsReceived] = useState([]);
 
   useEffect(() => {
-    socket.on("playerList", (players) => {
-      setPlayers(players);
-    });
+    if (!socket.connected) navigate("/");
 
+    socket.on("playerList", (room) => {
+      setRoomInfo(room);
+    });
     // socket.on("countrySelector", ({ username }) => {
     //   setCountrySelector(username);
     // });
@@ -31,7 +35,7 @@ const useSocket = () => {
       // socket.off("receiveHint");
       // socket.off("countrySelected");
     };
-  }, []);
+  }, [navigate]);
 
   // const handleSelectCountry = () => {
   //   if (username === countrySelector) {
@@ -46,7 +50,7 @@ const useSocket = () => {
   //   setHint("");
   // };
 
-  return { players };
+  return { roomInfo };
 };
 
 export default useSocket;

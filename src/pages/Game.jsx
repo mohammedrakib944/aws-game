@@ -7,8 +7,9 @@ import Hints from "../sections/Hints";
 import Players from "../sections/Players";
 
 const Game = () => {
-  const { players } = useSocket();
-  console.log("Players: ", players);
+  const { roomInfo } = useSocket();
+
+  console.log("Players: ", roomInfo);
 
   return (
     <div>
@@ -19,7 +20,7 @@ const Game = () => {
       {/* <MapView /> */}
       <div className="max-w-[1200px] mx-auto flex gap-2 lg:gap-4 px-2 lg:px-5 py-4">
         <div className="w-[250px]">
-          <Players />
+          <Players roomInfo={roomInfo} />
         </div>
         <div className="w-full grid grid-cols-2 gap-2 lg:gap-4">
           <Hints />

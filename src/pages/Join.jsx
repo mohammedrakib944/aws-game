@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { generateUniqueNumber } from "../utils/helper";
 import Navbar from "../components/Navbar";
-import axios from "axios";
-import { API_BASE_URL, socket } from "../hooks/useSocket";
+
+import { socket } from "../hooks/useSocket";
 
 const RoomType = {
   CREATE: "create",
@@ -43,13 +43,8 @@ const Join = () => {
       room_number: uniqueNumber,
     };
 
-    try {
-      await axios.post(API_BASE_URL + "/join", gamePayload);
-      socket.emit("joinRoom", gamePayload);
-      navigate("/game");
-    } catch (error) {
-      console.error("Failed to join room:", error);
-    }
+    socket.emit("joinRoom", gamePayload);
+    navigate("/game?room=" + uniqueNumber);
   };
 
   return (
