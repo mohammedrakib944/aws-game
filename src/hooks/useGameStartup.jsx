@@ -1,14 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import io from "socket.io-client";
+import { useEffect } from "react";
+import { socket } from "./base";
+import { useGameContext } from "../context/game-context";
 
-export const API_BASE_URL = "http://localhost:8000";
-
-export const socket = io(API_BASE_URL);
-
-const useSocket = () => {
-  const navigate = useNavigate();
-  const [roomInfo, setRoomInfo] = useState([]);
+const useGameStartup = () => {
+  const setRoomInfo = useGameContext().setRoomInfo;
 
   // const [countrySelector, setCountrySelector] = useState("");
   // const [country, setCountry] = useState("");
@@ -16,11 +11,14 @@ const useSocket = () => {
   // const [hintsReceived, setHintsReceived] = useState([]);
 
   useEffect(() => {
-    if (!socket.connected) navigate("/");
+    if (!socket.connected) {
+      socket.connect();
+    }
 
     socket.on("playerList", (room) => {
       setRoomInfo(room);
     });
+
     // socket.on("countrySelector", ({ username }) => {
     //   setCountrySelector(username);
     // });
@@ -35,7 +33,7 @@ const useSocket = () => {
       // socket.off("receiveHint");
       // socket.off("countrySelected");
     };
-  }, [navigate]);
+  }, []);
 
   // const handleSelectCountry = () => {
   //   if (username === countrySelector) {
@@ -50,7 +48,7 @@ const useSocket = () => {
   //   setHint("");
   // };
 
-  return { roomInfo };
+  // return {};
 };
 
-export default useSocket;
+export default useGameStartup;

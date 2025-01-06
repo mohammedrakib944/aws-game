@@ -4,7 +4,8 @@ import { useNavigate, useSearchParams } from "react-router";
 import { generateUniqueNumber } from "../utils/helper";
 import Navbar from "../components/Navbar";
 
-import { socket } from "../hooks/useSocket";
+import { socket } from "../hooks/base";
+import { useGameContext } from "../context/game-context";
 
 const RoomType = {
   CREATE: "create",
@@ -17,6 +18,7 @@ const Join = () => {
   const [showError, setShowError] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const setRoomInfo = useGameContext().setRoomInfo;
   const roomType = searchParams.get("type");
 
   useEffect(() => {
@@ -43,8 +45,17 @@ const Join = () => {
       room_number: uniqueNumber,
     };
 
-    socket.emit("joinRoom", gamePayload);
-    navigate("/game?room=" + uniqueNumber);
+    // Ensure the socket is connected before emitting
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    if (socket.connected) {
+      socket.emit("joinRoom", gamePayload, (response) => {
+        setRoomInfo(response);
+      });
+      navigate("/game?room=" + uniqueNumber);
+    }
   };
 
   return (

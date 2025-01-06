@@ -94,13 +94,16 @@ function MapView() {
   }, []);
 
   return (
-    <div>
+    <>
       <div
         ref={mapRef}
         style={{
-          width: "100vw",
-          height: "70vh",
-          position: "fixed",
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          borderRadius: "10px",
+          padding: "10px",
+          overflow: "hidden",
           top: 0,
           left: 0,
           zIndex: "0",
@@ -116,7 +119,7 @@ function MapView() {
           border: 2px solid white;
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import CommentCard from "../components/comment-card";
+import CommentCard from "../../components/comment-card";
 
 const Answers = () => {
   const handleSubmit = (e) => {

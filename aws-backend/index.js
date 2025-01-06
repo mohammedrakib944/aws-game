@@ -73,7 +73,8 @@ function startNewRound(room_number) {
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  socket.on("joinRoom", ({ username, room_number }) => {
+  socket.on("joinRoom", ({ username, room_number }, callback) => {
+    console.log(username, " Join!");
     if (!rooms[room_number]) {
       rooms[room_number] = {
         players: [],
@@ -95,11 +96,18 @@ io.on("connection", (socket) => {
 
     socket.join(room_number);
 
+    console.log("Emitting playerList to room:", room_number, room.players);
+
     io.to(room_number).emit("playerList", {
       players: room.players,
       admin: room.admin,
     });
-    console.log(`${username} joined room ${room_number}`);
+
+    // Successfully joined
+    callback({
+      players: room.players,
+      admin: room.admin,
+    });
   });
 
   socket.on("startGame", ({ room_number, username }) => {
@@ -123,17 +131,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    console.log("Player Disconnected");
     for (const room_number in rooms) {
       const room = rooms[room_number];
-
-      console.log("Players: ", room.players);
 
       const playerIndex = room.players.findIndex(
         (p) => p.socketId === socket.id
       );
+
       if (playerIndex !== -1) {
         const player = room.players.splice(playerIndex, 1)[0];
-        console.log("Find user: ", player);
 
         if (room.countrySelector === player.username) {
           room.countrySelector =

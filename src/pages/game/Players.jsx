@@ -1,14 +1,20 @@
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-const Players = ({ roomInfo }) => {
+import { useGameContext } from "../../context/game-context";
+const Players = () => {
+  const roomInfo = useGameContext().roomInfo;
+
   useEffect(() => {
     if (roomInfo?.isLeft) {
       toast(roomInfo.message);
     }
   }, [roomInfo]);
+
   return (
     <div>
-      <h2 className="text-xl font-bold pb-1">Participants</h2>
+      <h2 className="text-xl font-bold pb-1">
+        {roomInfo?.players?.length} Participants
+      </h2>
       <div className="h-[500px] overflow-y-auto bg-gray-50 rounded-lg border space-y-1">
         {roomInfo?.players &&
           roomInfo.players?.map((player, index) => (
