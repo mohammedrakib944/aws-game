@@ -8,6 +8,7 @@ const GameContextProvider = ({ children }) => {
   const [location, setLocation] = useState("");
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [roomInfo, setRoomInfo] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
 
   const values = {
     location,
@@ -16,6 +17,8 @@ const GameContextProvider = ({ children }) => {
     setLoadingLocation,
     roomInfo,
     setRoomInfo,
+    userInfo,
+    setUserInfo,
   };
 
   return <gameContext.Provider value={values}>{children}</gameContext.Provider>;

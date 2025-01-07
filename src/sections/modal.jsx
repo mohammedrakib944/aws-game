@@ -3,7 +3,7 @@ import Loader from "../components/loader";
 import { useGameContext } from "../context/game-context";
 import MapView from "./map-view";
 
-const Modal = ({ showMap, setShowMap }) => {
+const Modal = ({ showMap, handleSelectCountry }) => {
   const { location, loadingLocation } = useGameContext();
 
   return (
@@ -22,7 +22,9 @@ const Modal = ({ showMap, setShowMap }) => {
                 )}
               </div>
 
-              <Button onClick={() => setShowMap(false)}>Confirm</Button>
+              <Button disabled={!location} onClick={handleSelectCountry}>
+                Confirm
+              </Button>
             </div>
             <MapView />
           </div>

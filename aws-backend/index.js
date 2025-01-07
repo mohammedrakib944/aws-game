@@ -2,12 +2,13 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import { getPlayer, sendRandomCharacter } from "./helper.js";
 
 const app = express();
 const server = http.createServer(app);
 
 const PORT = 8000;
-const TIMER = 60000; // 1 min
+// const TIMER = 100000; // 100 seconds
 
 app.use(cors());
 app.options("*", cors());
@@ -30,7 +31,7 @@ function startNewRound(room_number) {
 
   // Check if all players have had 3 turns
   const allTurnsComplete = room.players.every(
-    (player) => room.turns[player.username] >= 3
+    (player) => room.turns[player.id] >= 3
   );
 
   if (allTurnsComplete) {
@@ -43,42 +44,30 @@ function startNewRound(room_number) {
   }
 
   // Select the next player in sequence
-  let selectorFound = false;
-  while (!selectorFound) {
-    room.selectorIndex = (room.selectorIndex + 1) % room.players.length;
-    const nextPlayer = room.players[room.selectorIndex];
+  const player = getPlayer(room);
 
-    if (room.turns[nextPlayer.username] < 3) {
-      room.countrySelector = nextPlayer.username;
-      room.turns[nextPlayer.username]++;
-      selectorFound = true;
-    }
-  }
-
-  room.countryName = null; // Reset the country name for the new round
-
-  io.to(room_number).emit("newRound", {
-    countrySelector: room.countrySelector,
-    message: `A new round has started! ${room.countrySelector} will choose a country.`,
-  });
+  io.to(room_number).emit("newRound", player);
 
   // Restart the timer for the next round after 60 seconds
-  clearTimeout(room.timer);
-  room.timer = setTimeout(() => {
-    io.to(room_number).emit("roundTimeout", { message: "Time's up!" });
-    startNewRound(room_number);
-  }, TIMER);
+  // clearTimeout(room.timer);
+  // room.timer = setTimeout(() => {
+  //   io.to(room_number).emit("roundTimeout", { message: "Time's up!" });
+  //   startNewRound(room_number);
+  // }, TIMER);
 }
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  socket.on("joinRoom", ({ username, room_number }, callback) => {
+  socket.on("joinRoom", ({ id, username, room_number }, callback) => {
     console.log(username, " Join!");
     if (!rooms[room_number]) {
       rooms[room_number] = {
         players: [],
-        admin: username,
+        admin: {
+          id,
+          username,
+        },
         selectorIndex: -1,
         timer: null,
         countryName: null,
@@ -87,16 +76,14 @@ io.on("connection", (socket) => {
     }
 
     const room = rooms[room_number];
-    const player = room.players.find((p) => p.username === username);
+    const player = room.players.find((p) => p.id === id);
 
     if (!player) {
-      room.players.push({ username, socketId: socket.id, playing: false });
-      room.turns[username] = 0;
+      room.players.push({ id, username, socketId: socket.id, playing: false });
+      room.turns[id] = 0;
     }
 
     socket.join(room_number);
-
-    console.log("Emitting playerList to room:", room_number, room.players);
 
     io.to(room_number).emit("playerList", {
       players: room.players,
@@ -110,10 +97,10 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("startGame", ({ room_number, username }) => {
+  socket.on("startGame", ({ room_number, id, username }) => {
     const room = rooms[room_number];
 
-    if (room && room.admin === username) {
+    if (room && room.admin.id === id) {
       console.log(`Game started by admin: ${username} in room ${room_number}`);
       startNewRound(room_number);
     }
@@ -121,9 +108,8 @@ io.on("connection", (socket) => {
 
   socket.on("selectCountry", ({ room_number, country }) => {
     const room = rooms[room_number];
-    if (room && room.countrySelector === socket.username) {
-      io.to(room_number).emit("countrySelected", { country });
-    }
+    room.countryName = country; // Update the country name
+    sendRandomCharacter(io, room_number, country);
   });
 
   socket.on("sendHint", ({ room_number, hint }) => {

@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { socket } from "./base";
 import { useGameContext } from "../context/game-context";
 
 const useGameStartup = () => {
   const setRoomInfo = useGameContext().setRoomInfo;
 
-  // const [countrySelector, setCountrySelector] = useState("");
-  // const [country, setCountry] = useState("");
+  const [countrySelector, setCountrySelector] = useState(null);
+  const [countrySelected, setCountrySelected] = useState(null);
   // const [hint, setHint] = useState("");
   // const [hintsReceived, setHintsReceived] = useState([]);
 
@@ -19,9 +19,13 @@ const useGameStartup = () => {
       setRoomInfo(room);
     });
 
-    // socket.on("countrySelector", ({ username }) => {
-    //   setCountrySelector(username);
-    // });
+    socket.on("newRound", (data) => {
+      setCountrySelector(data);
+    });
+
+    socket.on("countrySelected", (data) => {
+      setCountrySelected(data);
+    });
 
     // socket.on("receiveHint", ({ hint }) => {
     //   setHintsReceived((prevHints) => [...prevHints, hint]);
@@ -29,7 +33,8 @@ const useGameStartup = () => {
 
     return () => {
       socket.off("playerList");
-      // socket.off("countrySelector");
+      socket.off("newRound");
+      socket.off("countrySelected");
       // socket.off("receiveHint");
       // socket.off("countrySelected");
     };
@@ -48,7 +53,7 @@ const useGameStartup = () => {
   //   setHint("");
   // };
 
-  // return {};
+  return { countrySelector, countrySelected };
 };
 
 export default useGameStartup;

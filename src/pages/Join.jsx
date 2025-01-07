@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 
 import { socket } from "../hooks/base";
 import { useGameContext } from "../context/game-context";
+import { v4 as uuidv4 } from "uuid";
 
 const RoomType = {
   CREATE: "create",
@@ -19,6 +20,7 @@ const Join = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const setRoomInfo = useGameContext().setRoomInfo;
+  const setUserInfo = useGameContext().setUserInfo;
   const roomType = searchParams.get("type");
 
   useEffect(() => {
@@ -41,9 +43,12 @@ const Join = () => {
     }
 
     const gamePayload = {
+      id: uuidv4(),
       username: name,
       room_number: uniqueNumber,
     };
+
+    setUserInfo(gamePayload);
 
     // Ensure the socket is connected before emitting
     if (!socket.connected) {
