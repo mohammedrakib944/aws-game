@@ -21,9 +21,9 @@ const Game = () => {
   const roomInfo = useGameContext().roomInfo;
   const userInfo = useGameContext().userInfo;
   const location = useGameContext().location;
-  const { countrySelector, countrySelected } = useGameStartup();
+  const { countrySelector, countrySelected, hintsReceived } = useGameStartup();
 
-  console.log("Country Selected: ", countrySelected);
+  const isOwner = countrySelector?.id === userInfo?.id;
 
   const handleStartGame = () => {
     socket.emit("startGame", {
@@ -48,10 +48,7 @@ const Game = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (
-      countrySelector?.id === userInfo?.id &&
-      countrySelected?.status !== "running"
-    ) {
+    if (isOwner && countrySelected?.status !== "end") {
       setShowMap(true);
     }
   }, [countrySelector, userInfo, countrySelected]);
@@ -96,9 +93,13 @@ const Game = () => {
               {countrySelector.username} is choosing a Place!
             </h4>
           )}
-          {countrySelected && (
+          {!countrySelected && (
             <div className="w-full grid grid-cols-2 gap-2 lg:gap-4">
-              <Hints />
+              <Hints
+                room_number={room_number}
+                isOwner={isOwner}
+                hintsReceived={hintsReceived}
+              />
               <Answers />
             </div>
           )}

@@ -7,8 +7,7 @@ const useGameStartup = () => {
 
   const [countrySelector, setCountrySelector] = useState(null);
   const [countrySelected, setCountrySelected] = useState(null);
-  // const [hint, setHint] = useState("");
-  // const [hintsReceived, setHintsReceived] = useState([]);
+  const [hintsReceived, setHintsReceived] = useState(null);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -27,6 +26,10 @@ const useGameStartup = () => {
       setCountrySelected(data);
     });
 
+    socket.on("receiveHint", (data) => {
+      setHintsReceived(data);
+    });
+
     // socket.on("receiveHint", ({ hint }) => {
     //   setHintsReceived((prevHints) => [...prevHints, hint]);
     // });
@@ -35,7 +38,7 @@ const useGameStartup = () => {
       socket.off("playerList");
       socket.off("newRound");
       socket.off("countrySelected");
-      // socket.off("receiveHint");
+      socket.off("receiveHint");
       // socket.off("countrySelected");
     };
   }, []);
@@ -53,7 +56,7 @@ const useGameStartup = () => {
   //   setHint("");
   // };
 
-  return { countrySelector, countrySelected };
+  return { countrySelector, countrySelected, hintsReceived };
 };
 
 export default useGameStartup;
