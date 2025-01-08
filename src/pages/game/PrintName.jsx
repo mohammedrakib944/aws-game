@@ -24,8 +24,8 @@ const PrintName = ({ data }) => {
   }, [data, displayString]);
 
   return (
-    <div className="text-xl font-semibold">
-      <span className="text-gray-500">System Hint: </span> {displayString}
+    <div className="text-3xl font-semibold">
+      <span className="text-gray-500"></span> {displayString}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { getPlayer, sendRandomCharacter } from "./helper.js";
+import { getPlayer, sendAnswer, sendRandomCharacter } from "./helper.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -108,12 +108,16 @@ io.on("connection", (socket) => {
 
   socket.on("selectCountry", ({ room_number, country }) => {
     const room = rooms[room_number];
-    room.countryName = country; // Update the country name
+    room.countryName = country;
     sendRandomCharacter(io, room_number, country);
   });
 
   socket.on("sendHint", ({ room_number, hint }) => {
     io.to(room_number).emit("receiveHint", { hint });
+  });
+
+  socket.on("sendAnswer", (data) => {
+    sendAnswer(io, data, rooms);
   });
 
   socket.on("disconnect", () => {

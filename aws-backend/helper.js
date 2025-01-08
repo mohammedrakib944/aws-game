@@ -63,3 +63,61 @@ export const sendRandomCharacter = (io, roomNumber, str) => {
     });
   }, intervalTime);
 };
+
+export const sendAnswer = (io, data, rooms) => {
+  const { room_number, user_id, username, answer } = data;
+
+  const room = rooms[room_number];
+
+  if (!room) {
+    console.log("Room not found.");
+    return;
+  }
+
+  // Ensure countryName is set
+  if (!room.countryName) {
+    console.log("Country name not set.");
+    return;
+  }
+
+  // Check if the user already answered correctly
+  if (room.turns[user_id] > 0) {
+    console.log(`${username} already answered correctly.`);
+    return;
+  }
+
+  // Check if the answer is correct
+  if (answer.toLowerCase() === room.countryName.toLowerCase()) {
+    // Determine points based on the order of correct answers
+    const correctAnswersCount = Object.values(room.turns).filter(
+      (points) => points > 0
+    ).length;
+    const pointsAwarded = Math.max(1000 - correctAnswersCount * 50, 100);
+
+    // Update player's points
+    const player = room.players.find((p) => p.id === user_id);
+    if (player) {
+      room.turns[user_id] = pointsAwarded; // Record the points for this turn
+      player.points = (player.points || 0) + pointsAwarded; // Add points to player's total
+    }
+
+    console.log(
+      `${username} answered correctly and earned ${pointsAwarded} points.`
+    );
+
+    // Broadcast the updated scores and answer to everyone in the room
+    io.to(room_number).emit("receiveAnswer", {
+      username,
+      answer: "Correct Answer!!",
+      correct: true,
+      points: player.points,
+    });
+  } else {
+    console.log(`${username} answered incorrectly.`);
+    io.to(room_number).emit("receiveAnswer", {
+      username,
+      answer,
+      correct: false,
+    });
+  }
+};

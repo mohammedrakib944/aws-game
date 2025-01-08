@@ -8,6 +8,7 @@ const useGameStartup = () => {
   const [countrySelector, setCountrySelector] = useState(null);
   const [countrySelected, setCountrySelected] = useState(null);
   const [hintsReceived, setHintsReceived] = useState(null);
+  const [answerReceived, setAnswerReceived] = useState(null);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -30,33 +31,20 @@ const useGameStartup = () => {
       setHintsReceived(data);
     });
 
-    // socket.on("receiveHint", ({ hint }) => {
-    //   setHintsReceived((prevHints) => [...prevHints, hint]);
-    // });
+    socket.on("receiveAnswer", (data) => {
+      setAnswerReceived(data);
+    });
 
     return () => {
       socket.off("playerList");
       socket.off("newRound");
       socket.off("countrySelected");
       socket.off("receiveHint");
-      // socket.off("countrySelected");
+      socket.off("receiveAnswer");
     };
   }, []);
 
-  // const handleSelectCountry = () => {
-  //   if (username === countrySelector) {
-  //     socket.emit("selectCountry", { room_number: roomNumber, country });
-  //   } else {
-  //     alert("Only the country selector can choose the country.");
-  //   }
-  // };
-
-  // const sendHint = () => {
-  //   socket.emit("sendHint", { room_number: roomNumber, hint });
-  //   setHint("");
-  // };
-
-  return { countrySelector, countrySelected, hintsReceived };
+  return { countrySelector, countrySelected, hintsReceived, answerReceived };
 };
 
 export default useGameStartup;

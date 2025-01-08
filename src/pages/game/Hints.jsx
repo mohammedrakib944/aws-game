@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import CommentCard from "../../components/comment-card";
 import { socket } from "../../hooks/base";
 import toast from "react-hot-toast";
 
@@ -38,17 +37,24 @@ const Hints = ({ room_number, isOwner, hintsReceived }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold pb-1 text-center">Hints</h2>
+      <h2 className="text-xl font-bold pb-1 px-2">Hints</h2>
       <div
         ref={messageRef}
-        className="h-[500px] overflow-y-auto scrollbar-hide p-4 rounded-lg border space-y-1.5"
+        className="h-[500px] overflow-y-auto scrollbar-hide rounded-lg border"
       >
-        {messages?.length &&
+        {messages?.length ? (
           messages.map((message, index) => (
-            <CommentCard key={index} comment={message} variant="blue" />
-          ))}
+            <div key={index} className="px-4 py-2 border-b">
+              {message}
+            </div>
+          ))
+        ) : (
+          <div className="flex items-center justify-center">
+            <span className="text-gray-400">No hints found!</span>
+          </div>
+        )}
       </div>
-      {!isOwner && (
+      {isOwner && (
         <form className="w-full mt-3" onSubmit={handleSubmit}>
           <input
             type="text"
