@@ -1,0 +1,25 @@
+# version: "3.8"
+services:
+  aws-game-client:
+    container_name: aws-game-client
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - aws-game
+  aws-game-server:
+    container_name: aws-game-server
+    build:
+      context: ./aws-backend/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - aws-game
+networks:
+  aws-game:
+    driver: bridge
