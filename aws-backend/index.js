@@ -2,13 +2,17 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { getPlayer, sendAnswer, sendRandomCharacter } from "./helper.js";
+import {
+  getPlayer,
+  sendAnswer,
+  sendRandomCharacter,
+  startTimer,
+} from "./helper.js";
 
 const app = express();
 const server = http.createServer(app);
 
 const PORT = 8000;
-// const TIMER = 100000; // 100 seconds
 
 app.use(cors());
 app.options("*", cors());
@@ -46,14 +50,11 @@ function startNewRound(room_number) {
   // Select the next player in sequence
   const player = getPlayer(room);
 
+  io.to(room_number).emit(
+    "choosing",
+    `${player.username} is choosing a place!`
+  );
   io.to(room_number).emit("newRound", player);
-
-  // Restart the timer for the next round after 60 seconds
-  // clearTimeout(room.timer);
-  // room.timer = setTimeout(() => {
-  //   io.to(room_number).emit("roundTimeout", { message: "Time's up!" });
-  //   startNewRound(room_number);
-  // }, TIMER);
 }
 
 io.on("connection", (socket) => {
@@ -107,8 +108,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("selectCountry", ({ room_number, country }) => {
+    if (!room_number || !country) {
+      console.log("No country name found!");
+      return;
+    }
+
     const room = rooms[room_number];
     room.countryName = country;
+
+    io.to(room_number).emit("endRound", false);
+    startTimer(io, room_number, country, rooms);
     sendRandomCharacter(io, room_number, country);
   });
 
