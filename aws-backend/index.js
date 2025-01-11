@@ -3,11 +3,17 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import {
-  getPlayer,
   sendAnswer,
   sendRandomCharacter,
+  startNewRound,
   startTimer,
-} from "./helper.js";
+} from "./services.js";
+import {
+  broadcastHints,
+  sendPlayersOfRoom,
+  sendStatus,
+  STATUS,
+} from "./senders.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -24,38 +30,9 @@ const io = new Server(server, {
   },
 });
 
-let rooms = {}; // Example: { "234234": { players: [], admin: null, countrySelector: null, ... } }
+let rooms = {};
 
 app.use(express.json());
-
-function startNewRound(room_number) {
-  const room = rooms[room_number];
-
-  if (!room || room.players.length === 0) return;
-
-  // Check if all players have had 3 turns
-  const allTurnsComplete = room.players.every(
-    (player) => room.turns[player.id] >= 3
-  );
-
-  if (allTurnsComplete) {
-    io.to(room_number).emit("gameOver", {
-      message: "Game over! Each player has had 3 turns.",
-    });
-    clearTimeout(room.timer); // Clear the timer
-    delete rooms[room_number]; // Remove room data
-    return;
-  }
-
-  // Select the next player in sequence
-  const player = getPlayer(room);
-
-  io.to(room_number).emit(
-    "choosing",
-    `${player.username} is choosing a place!`
-  );
-  io.to(room_number).emit("newRound", player);
-}
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -69,24 +46,30 @@ io.on("connection", (socket) => {
           id,
           username,
         },
-        selectorIndex: -1,
-        timer: null,
         countryName: null,
+        level: 0,
         turns: {},
+        correctAnswers: {},
       };
+
+      sendStatus(io, room_number, STATUS.START_GAME, {
+        username: username,
+        user_id: id,
+        message: `Wait for admin (${username}) to start the Game!`,
+      });
     }
 
     const room = rooms[room_number];
     const player = room.players.find((p) => p.id === id);
 
     if (!player) {
-      room.players.push({ id, username, socketId: socket.id, playing: false });
-      room.turns[id] = 0;
+      room.players.push({ id, username, socketId: socket.id });
+      room.turns[id] = 0; // make turns 0
     }
 
     socket.join(room_number);
 
-    io.to(room_number).emit("playerList", {
+    sendPlayersOfRoom(io, room_number, {
       players: room.players,
       admin: room.admin,
     });
@@ -102,8 +85,8 @@ io.on("connection", (socket) => {
     const room = rooms[room_number];
 
     if (room && room.admin.id === id) {
-      console.log(`Game started by admin: ${username} in room ${room_number}`);
-      startNewRound(room_number);
+      console.log(`Game started by admin: ${username}`);
+      startNewRound(io, rooms, room_number);
     }
   });
 
@@ -116,13 +99,13 @@ io.on("connection", (socket) => {
     const room = rooms[room_number];
     room.countryName = country;
 
-    io.to(room_number).emit("endRound", false);
+    sendStatus(io, room_number, STATUS.ROUND_START);
     startTimer(io, room_number, country, rooms);
     sendRandomCharacter(io, room_number, country);
   });
 
   socket.on("sendHint", ({ room_number, hint }) => {
-    io.to(room_number).emit("receiveHint", { hint });
+    broadcastHints(io, room_number, hint);
   });
 
   socket.on("sendAnswer", (data) => {

@@ -23,9 +23,7 @@ const Players = () => {
               className="px-4 py-2 border-b flex items-center justify-between"
             >
               <h4 className="text-lg font-bold">{player?.username}</h4>
-              <p className="text-xs">
-                {player?.playing ? "Playing" : "Not playing"}
-              </p>
+              <p className="text-xs">{player?.points && player?.points}</p>
             </div>
           ))}
       </div>

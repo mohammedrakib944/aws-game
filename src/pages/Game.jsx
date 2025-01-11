@@ -21,8 +21,14 @@ const Game = () => {
   const roomInfo = useGameContext().roomInfo;
   const userInfo = useGameContext().userInfo;
   const location = useGameContext().location;
-  const { countrySelector, countrySelected, hintsReceived, answerReceived } =
-    useGameStartup();
+  const {
+    countrySelector,
+    countrySelected,
+    hintsReceived,
+    answerReceived,
+    timer,
+    endRound,
+  } = useGameStartup();
 
   const isOwner = countrySelector?.id === userInfo?.id;
 
@@ -49,10 +55,14 @@ const Game = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (isOwner && countrySelected?.status !== "running") {
+    if (isOwner && countrySelector?.playing) {
       setShowMap(true);
     }
-  }, [countrySelector, userInfo, countrySelected]);
+  }, [countrySelector, isOwner]);
+
+  useEffect(() => {
+    if (timer && !isStarted) setIsStarted(true);
+  }, [timer, isStarted]);
 
   return (
     <div>
@@ -61,14 +71,27 @@ const Game = () => {
 
       <div className="system-width">
         <div className="flex items-end justify-between pt-4 pb-3">
-          <h1 className="text-xl font-semibold uppercase">Timer: 60</h1>
+          {/* <Timer start={startTimer} onTimeUp={onTimeUp} /> */}
+          <h1 className="text-xl font-semibold">
+            Timer:{" "}
+            <span className="text-blue-600 text-2xl font-bold">{timer}</span>
+          </h1>
+
           <h1>{countrySelected && <PrintName data={countrySelected} />}</h1>
           <h1 className="text-xl">
             Room: <span className="font-semibold">{room_number}</span>
           </h1>
         </div>
 
-        <div className="border rounded-lg shadow-xl flex gap-2 lg:gap-4 px-2 lg:px-5 py-4">
+        <div className="border rounded-lg shadow-xl flex gap-2 lg:gap-4 px-2 lg:px-5 py-4 relative">
+          {!isOwner && countrySelector?.username && !countrySelected && (
+            <div className="absolute w-full h-full top-0 left-0 bg-black/70 backdrop-blur-sm rounded-lg flex items-center justify-center">
+              <h2 className="text-4xl text-white">
+                {countrySelector.username} is Choosing a place!
+              </h2>
+            </div>
+          )}
+
           <div className="w-[250px]">
             <Players />
           </div>
@@ -89,23 +112,20 @@ const Game = () => {
                 </h2>
               </div>
             )}
-            {countrySelector && !countrySelected && (
-              <h4 className="text-xl font-semibold">
-                {countrySelector.username} is choosing a Place!
-              </h4>
-            )}
             {countrySelected && (
               <div className="w-full grid grid-cols-2 gap-2 lg:gap-4">
                 <Hints
                   room_number={room_number}
                   isOwner={isOwner}
                   hintsReceived={hintsReceived}
+                  reset={endRound}
                 />
                 <Answers
                   room_number={room_number}
                   isOwner={isOwner}
                   answerReceived={answerReceived}
                   userInfo={userInfo}
+                  reset={endRound}
                 />
               </div>
             )}

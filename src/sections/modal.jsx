@@ -9,7 +9,7 @@ const Modal = ({ showMap, handleSelectCountry }) => {
   return (
     <>
       {showMap ? (
-        <div className="fixed w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="w-[80%] h-[70%] mx-auto rounded-xl p-4 border bg-white relative">
             <div className="absolute w-[500px] -top-16 left-1/2 -translate-x-1/2 bg-white px-7 pb-5 pt-3 rounded-xl text-lg font-semibold text-center flex items-center justify-between">
               <div>
