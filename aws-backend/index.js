@@ -94,6 +94,12 @@ io.on("connection", (socket) => {
     const room = rooms[room_number];
 
     room.isStarted = true;
+
+    if (!room.admin) {
+      console.log("No admin found!");
+      return;
+    }
+
     if (room && room.admin.id === id) {
       console.log(`Game started by admin: ${username}`);
       startNewRound(io, rooms, room_number);

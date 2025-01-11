@@ -12,7 +12,7 @@ const Players = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold pb-1">
+      <h2 className="font-semibold pl-2 pb-1">
         {roomInfo?.players?.length} Participants
       </h2>
       <div className="h-[500px] overflow-y-auto bg-gray-50 rounded-lg border space-y-1">

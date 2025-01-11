@@ -10,7 +10,7 @@ import {
 
 export const TIMER = 20; // 100 seconds
 export const BREAK_TIME = 5; // seconds
-export const TOTAL_LEVEL = 2;
+export const TOTAL_LEVEL = 1;
 
 export const getPlayer = (room) => {
   const nextPlayer = room.players.find(
@@ -51,16 +51,17 @@ export const startNewRound = (io, rooms, room_number) => {
     //Handle Game Over
     console.log("Game is over!");
     const players_list = sortPlayersByPoints(room.players);
-    sendStatus(io, room_number, STATUS.GAME_OVER, { points: players_list });
+    sendStatus(io, room_number, STATUS.GAME_OVER, {
+      points: players_list,
+      admin_id: room.admin.id,
+    });
 
     // Reset Room data
-    rooms[room_number] = {
-      players: [],
-      countryName: null,
-      level: 0,
-      turns: {},
-      correctAnswers: {},
-    };
+    room.players = [];
+    room.countryName = null;
+    room.level = 0;
+    room.turns = {};
+    room.correctAnswers = {};
 
     return;
   }

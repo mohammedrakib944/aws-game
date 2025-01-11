@@ -55,6 +55,7 @@ const Answers = ({ room_number, isOwner, userInfo, answerReceived }) => {
               name={answer?.username}
               comment={answer?.answer}
               variant={answer?.correct ? "success" : null}
+              relax={answer?.relax}
             />
           ))
         ) : (

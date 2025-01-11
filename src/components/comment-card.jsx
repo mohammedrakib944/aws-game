@@ -1,9 +1,11 @@
-const CommentCard = ({ name, comment, variant }) => {
+const CommentCard = ({ name, comment, variant, relax }) => {
   return (
     <div
       className={`${
         variant === "success"
-          ? "bg-green-600 text-white"
+          ? relax
+            ? "bg-sky-600 text-white"
+            : "bg-green-600 text-white"
           : "bg-gray-50 text-black"
       } px-3 py-1.5 rounded space-y-1 shadow-inner border border-black/20`}
     >

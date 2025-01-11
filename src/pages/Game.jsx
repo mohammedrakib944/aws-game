@@ -113,12 +113,13 @@ const Game = () => {
   }
 
   if (status?.status === STATUS.GAME_OVER) {
-    const { points = [] } = status.data;
+    const { points = [], admin_id } = status.data;
 
     content = (
-      <div className="flex flex-col items-center">
-        <h2 className="text-2xl font-bold">Vai game ses! (Game is over!)</h2>
-        <div className="w-fit mt-3">
+      <div className="max-h-[70%] overflow-y-auto flex flex-col items-center">
+        <h2 className="text-4xl font-bold">Game is over!</h2>
+        {handleStartGame}
+        <div className="w-fit mt-3 border px-5 py-2 rounded-lg shadow-lg">
           {points.map((player, index) => (
             <p key={index} className="pb-1">
               <span className="font-bold text-blue-600">{index + 1}</span> -{" "}
@@ -130,6 +131,16 @@ const Game = () => {
             </p>
           ))}
         </div>
+
+        {admin_id === userInfo.id ? (
+          <div className="pt-4">
+            <Button onClick={handleStartGame}>Start Game Again?</Button>
+          </div>
+        ) : (
+          <p className="text-sm pt-3 font-bold text-blue-600">
+            Admin will decide game start again or not!
+          </p>
+        )}
       </div>
     );
   }
@@ -149,7 +160,7 @@ const Game = () => {
           <h1>
             {characters && (
               <PrintName
-                clearString={status?.status === STATUS.CHOOSING}
+                clearString={status?.status === STATUS.SHOW_ANSWER}
                 data={characters}
               />
             )}
