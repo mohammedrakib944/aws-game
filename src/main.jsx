@@ -8,16 +8,11 @@ import { Toaster } from "react-hot-toast";
 
 import Home from "./pages/Home.jsx";
 import Game from "./pages/Game.jsx";
-import Join from "./pages/Join.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
-  },
-  {
-    path: "/join",
-    element: <Join />,
   },
   {
     path: "/game",
