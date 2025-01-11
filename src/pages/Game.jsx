@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Answers from "./game/Answers";
 import { socket } from "../hooks/base";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import Hints from "./game/Hints";
 import Players from "./game/Players";
 import { useEffect, useState } from "react";
@@ -118,10 +118,9 @@ const Game = () => {
     content = (
       <div className="max-h-[70%] overflow-y-auto flex flex-col items-center">
         <h2 className="text-4xl font-bold">Game is over!</h2>
-        {handleStartGame}
         <div className="w-fit mt-3 border px-5 py-2 rounded-lg shadow-lg">
           {points.map((player, index) => (
-            <p key={index} className="pb-1">
+            <p key={index} className="pb-1 text-lg">
               <span className="font-bold text-blue-600">{index + 1}</span> -{" "}
               <span className="font-semibold">{player.username}</span>{" "}
               <span className="text-green-600 font-semibold">
@@ -135,10 +134,20 @@ const Game = () => {
         {admin_id === userInfo.id ? (
           <div className="pt-4">
             <Button onClick={handleStartGame}>Start Game Again?</Button>
+            <NavLink to="/" className="block text-center pt-3">
+              <span className="font-semibold text-blue-600 hover:underline">
+                Go Home
+              </span>
+            </NavLink>
           </div>
         ) : (
-          <p className="text-sm pt-3 font-bold text-blue-600">
+          <p className="pt-5 font-bold">
             Admin will decide game start again or not!
+            <NavLink to="/" className="block text-center pt-3">
+              <span className="font-semibold text-blue-600 hover:underline">
+                Go Home
+              </span>
+            </NavLink>
           </p>
         )}
       </div>
@@ -166,7 +175,8 @@ const Game = () => {
             )}
           </h1>
           <h1 className="text-xl">
-            Room: <span className="font-semibold">{room_number}</span>
+            <span className="text-base font-semibold">Share this code</span>{" "}
+            <span className="font-semibold text-blue-600">{room_number}</span>
           </h1>
         </div>
 

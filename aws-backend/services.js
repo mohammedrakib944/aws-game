@@ -39,14 +39,16 @@ export const sortPlayersByPoints = (players) => {
 export const startNewRound = (io, rooms, room_number) => {
   const room = rooms[room_number];
 
+  console.log("Start round 1");
   if (!room || room.players.length === 0) return;
 
   // Clear all points
   room.correctAnswers = {};
-
+  console.log("Start round 2");
   // Select the next player in sequence
   const player = getPlayer(room);
 
+  console.log("Start round 3");
   if (player?.status === "all-player-done") {
     //Handle Game Over
     console.log("Game is over!");
@@ -60,14 +62,15 @@ export const startNewRound = (io, rooms, room_number) => {
     room.players = [];
     room.countryName = null;
     room.level = 0;
-    room.turns = {};
     room.correctAnswers = {};
+    room.isStarted = false;
+    Object.keys(room.turns).forEach((value) => (room.turns[value] = 0));
 
     return;
   }
 
   sendStatus(io, room_number, STATUS.CHOOSING, {
-    message: `${player.username} is choosing a place!`,
+    message: `${player.username} - is choosing a place!`,
     user_id: player.id,
   });
 

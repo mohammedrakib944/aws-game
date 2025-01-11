@@ -102,6 +102,7 @@ io.on("connection", (socket) => {
 
     if (room && room.admin.id === id) {
       console.log(`Game started by admin: ${username}`);
+      console.log("io, rooms, room-number: ", io, rooms, room_number);
       startNewRound(io, rooms, room_number);
     }
   });
