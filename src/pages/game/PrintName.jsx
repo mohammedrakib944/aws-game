@@ -4,8 +4,8 @@ const PrintName = ({ data }) => {
   const [displayString, setDisplayString] = useState("");
 
   useEffect(() => {
-    if (data && data.character) {
-      const { str_len, index } = data.character;
+    if (data) {
+      const { str_len, index } = data;
 
       // Initialize display string with underscores if it's empty or length changed
       if (displayString.length !== str_len) {

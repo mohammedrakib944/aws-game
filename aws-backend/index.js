@@ -47,14 +47,15 @@ io.on("connection", (socket) => {
           username,
         },
         countryName: null,
+        isStarted: false,
         level: 0,
         turns: {},
         correctAnswers: {},
       };
 
       sendStatus(io, room_number, STATUS.START_GAME, {
-        username: username,
-        user_id: id,
+        admin: username,
+        admin_id: id,
         message: `Wait for admin (${username}) to start the Game!`,
       });
     }
@@ -68,6 +69,14 @@ io.on("connection", (socket) => {
     }
 
     socket.join(room_number);
+
+    if (!room.isStarted) {
+      sendStatus(io, room_number, STATUS.START_GAME, {
+        admin: room.admin.username,
+        admin_id: room.admin.id,
+        message: `Wait for admin (${room.admin.username}) to start the Game!`,
+      });
+    }
 
     sendPlayersOfRoom(io, room_number, {
       players: room.players,
@@ -84,13 +93,14 @@ io.on("connection", (socket) => {
   socket.on("startGame", ({ room_number, id, username }) => {
     const room = rooms[room_number];
 
+    room.isStarted = true;
     if (room && room.admin.id === id) {
       console.log(`Game started by admin: ${username}`);
       startNewRound(io, rooms, room_number);
     }
   });
 
-  socket.on("selectCountry", ({ room_number, country }) => {
+  socket.on("selectCountry", ({ room_number, country, user_id }) => {
     if (!room_number || !country) {
       console.log("No country name found!");
       return;
@@ -99,7 +109,7 @@ io.on("connection", (socket) => {
     const room = rooms[room_number];
     room.countryName = country;
 
-    sendStatus(io, room_number, STATUS.ROUND_START);
+    sendStatus(io, room_number, STATUS.ROUND_START, { user_id });
     startTimer(io, room_number, country, rooms);
     sendRandomCharacter(io, room_number, country);
   });

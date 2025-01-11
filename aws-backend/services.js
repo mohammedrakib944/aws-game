@@ -10,7 +10,7 @@ import {
 
 export const TIMER = 20; // 100 seconds
 export const BREAK_TIME = 10; // seconds
-export const TOTAL_LEVEL = 3;
+export const TOTAL_LEVEL = 2;
 
 export const getPlayer = (room) => {
   const nextPlayer = room.players.find(

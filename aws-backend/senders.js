@@ -1,9 +1,16 @@
 export const STATUS = {
-  START_GAME: "not-started",
-  CHOOSING: "choosing",
-  ROUND_START: "round-start",
-  SHOW_ANSWER: "show-answer",
-  GAME_OVER: "game-over",
+  START_GAME: "not-started", // {admin, admin_id, message}
+  CHOOSING: "choosing", // {message, user_id} -> see the modal to owner, other messsage
+  ROUND_START: "round-start", // see the hints and message box
+  SHOW_ANSWER: "show-answer", // {answer} show the answeer
+  GAME_OVER: "game-over", // { points: players_list } all player points
+};
+
+export const sendStatus = (io, room_number, status = "", data) => {
+  io.to(room_number).emit("currentStatus", {
+    status,
+    data,
+  });
 };
 
 export const sendPlayersOfRoom = (io, room_number, data) => {
@@ -29,13 +36,6 @@ export const broadcastCharacters = (
 
 export const sendTimer = (io, room_number, seconds) => {
   io.to(room_number).emit("timer", seconds);
-};
-
-export const sendStatus = (io, room_number, status = "", data) => {
-  io.to(room_number).emit("currentStatus", {
-    status,
-    data,
-  });
 };
 
 export const broadcastHints = (io, room_number, hint) => {

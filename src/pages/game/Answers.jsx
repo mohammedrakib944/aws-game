@@ -3,7 +3,7 @@ import CommentCard from "../../components/comment-card";
 import { socket } from "../../hooks/base";
 import toast from "react-hot-toast";
 
-const Answers = ({ room_number, isOwner, userInfo, answerReceived, reset }) => {
+const Answers = ({ room_number, isOwner, userInfo, answerReceived }) => {
   const [answers, setAnswers] = useState([]);
   const answersRef = useRef(null);
 
@@ -28,8 +28,8 @@ const Answers = ({ room_number, isOwner, userInfo, answerReceived, reset }) => {
   };
 
   useEffect(() => {
-    if (reset) setAnswers([]);
-  }, [reset]);
+    setAnswers([]);
+  }, [isOwner]);
 
   useEffect(() => {
     if (answerReceived) setAnswers((prev) => [...prev, answerReceived]);

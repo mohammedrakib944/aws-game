@@ -12,25 +12,26 @@ import Modal from "../sections/modal";
 import { useGameContext } from "../context/game-context";
 import PrintName from "./game/PrintName";
 
+const STATUS = {
+  START_GAME: "not-started", // {admin, admin_id, message}
+  CHOOSING: "choosing", // {message, user_id} -> see the modal to owner, other messsage
+  ROUND_START: "round-start", // see the hints and message box
+  SHOW_ANSWER: "show-answer", // {answer} show the answeer
+  GAME_OVER: "game-over", // { points: players_list } all player points
+};
+
 const Game = () => {
   const [searchParams] = useSearchParams();
-  const [isStarted, setIsStarted] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const navigate = useNavigate();
   const room_number = searchParams.get("room");
-  const roomInfo = useGameContext().roomInfo;
+  const [isPlaying, setIsPlaying] = useState(false);
   const userInfo = useGameContext().userInfo;
   const location = useGameContext().location;
-  const {
-    countrySelector,
-    countrySelected,
-    hintsReceived,
-    answerReceived,
-    timer,
-    endRound,
-  } = useGameStartup();
+  const { hintsReceived, answerReceived, timer, status, characters } =
+    useGameStartup();
 
-  const isOwner = countrySelector?.id === userInfo?.id;
+  console.log("Status: ", status);
 
   const handleStartGame = () => {
     socket.emit("startGame", {
@@ -38,7 +39,6 @@ const Game = () => {
       id: userInfo?.id,
       username: userInfo?.username,
     });
-    setIsStarted(true);
   };
 
   const handleSelectCountry = () => {
@@ -46,89 +46,122 @@ const Game = () => {
     socket.emit("selectCountry", {
       room_number,
       country: location,
+      user_id: userInfo?.id,
     });
     setShowMap(false);
   };
+
+  let content;
+
+  if (status?.status === STATUS.START_GAME) {
+    const { admin_id, message } = status.data;
+    content = (
+      <div className="w-full flex flex-col gap-4 items-center justify-center">
+        <h2 className="text-xl font-semibold">
+          {admin_id === userInfo.id ? (
+            <div className="text-center">
+              <p className="pb-4 text-3xl font-semibold">Start the game now!</p>
+              <Button onClick={handleStartGame}>Start Game</Button>
+            </div>
+          ) : (
+            <span className="text-xl font-semibold">{message}</span>
+          )}
+        </h2>
+      </div>
+    );
+  }
+
+  if (status?.status !== STATUS.START_GAME) {
+    content = (
+      <div className="w-full grid grid-cols-2 gap-2 lg:gap-4">
+        <Hints
+          room_number={room_number}
+          isOwner={isPlaying}
+          hintsReceived={hintsReceived}
+        />
+        <Answers
+          room_number={room_number}
+          isOwner={isPlaying}
+          answerReceived={answerReceived}
+          userInfo={userInfo}
+        />
+      </div>
+    );
+  }
+
+  if (status?.status === STATUS.GAME_OVER) {
+    const { points = [] } = status.data;
+
+    content = (
+      <div className="flex flex-col items-center">
+        <h2 className="text-2xl font-bold">Vai game ses! (Game is over!)</h2>
+        <div className="w-fit mt-3">
+          {points.map((player, index) => (
+            <p key={index} className="pb-1">
+              <span className="font-bold text-blue-600">{index + 1}</span> -{" "}
+              <span>
+                {player.username}{" "}
+                <span className="text-green-600 font-semibold">
+                  {player.points}
+                </span>{" "}
+                Points
+              </span>
+            </p>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!socket.connected) navigate("/");
   }, [navigate]);
 
   useEffect(() => {
-    if (isOwner && countrySelector?.playing) {
-      setShowMap(true);
+    if (status?.status === STATUS.CHOOSING) {
+      const data = status.data;
+      if (data?.user_id === userInfo.id) {
+        setShowMap(true);
+        setIsPlaying(true);
+      } else {
+        setIsPlaying(false);
+      }
     }
-  }, [countrySelector, isOwner]);
-
-  useEffect(() => {
-    if (timer && !isStarted) setIsStarted(true);
-  }, [timer, isStarted]);
+  }, [status, userInfo]);
 
   return (
     <div>
       <Modal showMap={showMap} handleSelectCountry={handleSelectCountry} />
-      <Navbar />
+      <Navbar name={userInfo.username} />
 
       <div className="system-width">
         <div className="flex items-end justify-between pt-4 pb-3">
-          {/* <Timer start={startTimer} onTimeUp={onTimeUp} /> */}
           <h1 className="text-xl font-semibold">
             Timer:{" "}
             <span className="text-blue-600 text-2xl font-bold">{timer}</span>
           </h1>
 
-          <h1>{countrySelected && <PrintName data={countrySelected} />}</h1>
+          <h1>{characters && <PrintName data={characters} />}</h1>
           <h1 className="text-xl">
             Room: <span className="font-semibold">{room_number}</span>
           </h1>
         </div>
 
         <div className="border rounded-lg shadow-xl flex gap-2 lg:gap-4 px-2 lg:px-5 py-4 relative">
-          {!isOwner && countrySelector?.username && !countrySelected && (
-            <div className="absolute w-full h-full top-0 left-0 bg-black/70 backdrop-blur-sm rounded-lg flex items-center justify-center">
-              <h2 className="text-4xl text-white">
-                {countrySelector.username} is Choosing a place!
-              </h2>
+          {status?.status === STATUS.CHOOSING &&
+          status?.data?.user_id !== userInfo.id ? (
+            <div className="absolute w-full h-full top-0 left-0 bg-sky-600/70 backdrop-blur-sm rounded-lg flex items-center justify-center">
+              <h2 className="text-4xl text-white">{status?.data?.message}</h2>
             </div>
+          ) : (
+            ""
           )}
 
           <div className="w-[250px]">
             <Players />
           </div>
           <div className="w-full min-h-[500px] flex items-center justify-center">
-            {!isStarted && !countrySelector && (
-              <div className="w-full flex flex-col gap-4 items-center justify-center">
-                <h2 className="text-xl font-semibold">
-                  {roomInfo?.admin?.id === userInfo?.id ? (
-                    <div className="text-center">
-                      <p className="pb-4 text-4xl font-semibold">
-                        Start the game now!
-                      </p>
-                      <Button onClick={handleStartGame}>Start Game</Button>
-                    </div>
-                  ) : (
-                    `Wait for ${roomInfo?.admin?.username} (Admin) to start the game.`
-                  )}
-                </h2>
-              </div>
-            )}
-            {countrySelected && (
-              <div className="w-full grid grid-cols-2 gap-2 lg:gap-4">
-                <Hints
-                  room_number={room_number}
-                  isOwner={isOwner}
-                  hintsReceived={hintsReceived}
-                  reset={endRound}
-                />
-                <Answers
-                  room_number={room_number}
-                  isOwner={isOwner}
-                  answerReceived={answerReceived}
-                  userInfo={userInfo}
-                  reset={endRound}
-                />
-              </div>
-            )}
+            {content}
           </div>
         </div>
       </div>
