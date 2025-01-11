@@ -28,11 +28,10 @@ const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showAnswer, setShowAnswer] = useState(null);
   const userInfo = useGameContext().userInfo;
+  const roomInfo = useGameContext().roomInfo;
   const location = useGameContext().location;
   const { hintsReceived, answerReceived, timer, status, characters } =
     useGameStartup();
-
-  console.log("Status: ", status);
 
   const handleStartGame = () => {
     socket.emit("startGame", {
@@ -76,12 +75,24 @@ const Game = () => {
 
   let content;
 
-  if (status?.status === STATUS.START_GAME) {
-    const { admin_id, message } = status.data;
+  if (status?.status === STATUS.START_GAME || !status) {
+    let isAdmin;
+    let message;
+
+    if (status?.data) {
+      isAdmin = status.data.admin_id === userInfo.id;
+      message = status.data.message;
+    }
+
+    if (roomInfo.admin && userInfo) {
+      isAdmin = roomInfo.admin.id === userInfo.id;
+      message = `Wait please!`;
+    }
+
     content = (
       <div className="w-full flex flex-col gap-4 items-center justify-center">
         <h2 className="text-xl font-semibold">
-          {admin_id === userInfo.id ? (
+          {isAdmin ? (
             <div className="text-center">
               <p className="pb-4 text-3xl font-semibold">Start the game now!</p>
               <Button onClick={handleStartGame}>Start Game</Button>
@@ -92,19 +103,19 @@ const Game = () => {
         </h2>
       </div>
     );
-  }
-
-  if (status?.status !== STATUS.START_GAME) {
+  } else {
     content = (
       <div className="w-full grid grid-cols-2 gap-2 lg:gap-4">
         <Hints
           room_number={room_number}
           isOwner={isPlaying}
+          reset={status?.status === STATUS.SHOW_ANSWER}
           hintsReceived={hintsReceived}
         />
         <Answers
           room_number={room_number}
           isOwner={isPlaying}
+          reset={status?.status === STATUS.SHOW_ANSWER}
           answerReceived={answerReceived}
           userInfo={userInfo}
         />
@@ -119,16 +130,25 @@ const Game = () => {
       <div className="max-h-[70%] overflow-y-auto flex flex-col items-center">
         <h2 className="text-4xl font-bold">Game is over!</h2>
         <div className="w-fit mt-3 border px-5 py-2 rounded-lg shadow-lg">
-          {points.map((player, index) => (
-            <p key={index} className="pb-1 text-lg">
-              <span className="font-bold text-blue-600">{index + 1}</span> -{" "}
-              <span className="font-semibold">{player.username}</span>{" "}
-              <span className="text-green-600 font-semibold">
-                {player.points}
-              </span>{" "}
-              <span className="text-xs">Points</span>
-            </p>
-          ))}
+          <h2 className="font-semibold text-center pb-1 text-lg border-b mb-1">
+            Rank list
+          </h2>
+          <table>
+            <tbody>
+              {points.map((player, index) => (
+                <tr key={index}>
+                  <td className="px-3 py-1 font-semibold text-green-600 ">
+                    {index + 1}
+                  </td>
+                  <td className="px-3 py-1 font-semibold">{player.username}</td>
+                  <td className="px-3 py-1 font-semibold text-blue-600">
+                    {player.points}
+                  </td>
+                  <td className="px-3 py-1 text-sm">Points</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {admin_id === userInfo.id ? (
@@ -169,7 +189,10 @@ const Game = () => {
           <h1>
             {characters && (
               <PrintName
-                clearString={status?.status === STATUS.SHOW_ANSWER}
+                clearString={
+                  status?.status === STATUS.SHOW_ANSWER ||
+                  status?.status === STATUS.GAME_OVER
+                }
                 data={characters}
               />
             )}
@@ -195,7 +218,7 @@ const Game = () => {
           )}
 
           <div className="w-[250px]">
-            <Players />
+            <Players reset={status?.status === STATUS.GAME_OVER} />
           </div>
           <div className="w-full min-h-[500px] flex items-center justify-center">
             {content}

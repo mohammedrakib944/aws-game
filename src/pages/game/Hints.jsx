@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { socket } from "../../hooks/base";
 import toast from "react-hot-toast";
 
-const Hints = ({ room_number, isOwner, hintsReceived }) => {
+const Hints = ({ room_number, isOwner, hintsReceived, reset }) => {
   const [messages, setMessages] = useState([]);
   const messageRef = useRef(null);
 
@@ -24,8 +24,8 @@ const Hints = ({ room_number, isOwner, hintsReceived }) => {
     e.target[0].value = "";
   };
   useEffect(() => {
-    setMessages([]);
-  }, [isOwner]);
+    if (reset) setMessages([]);
+  }, [reset]);
 
   useEffect(() => {
     if (hintsReceived?.hint)
@@ -47,7 +47,7 @@ const Hints = ({ room_number, isOwner, hintsReceived }) => {
       >
         {messages?.length ? (
           messages.map((message, index) => (
-            <div key={index} className="px-4 py-2 border-b">
+            <div key={index} className="px-4 py-2 font-semibold border-b">
               {message}
             </div>
           ))

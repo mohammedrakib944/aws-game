@@ -1,4 +1,3 @@
-import React from "react";
 import { useGameContext } from "../context/game-context";
 import Button from "../components/button";
 import Loader from "./loader";

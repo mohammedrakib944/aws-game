@@ -59,12 +59,12 @@ export const startNewRound = (io, rooms, room_number) => {
     });
 
     // Reset Room data
-    room.players = [];
     room.countryName = null;
     room.level = 0;
     room.correctAnswers = {};
     room.isStarted = false;
     Object.keys(room.turns).forEach((value) => (room.turns[value] = 0));
+    room.players.forEach((player) => (player.points = 0));
 
     return;
   }

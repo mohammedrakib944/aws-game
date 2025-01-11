@@ -1,14 +1,22 @@
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useGameContext } from "../../context/game-context";
-const Players = () => {
+const Players = ({ reset }) => {
   const roomInfo = useGameContext().roomInfo;
+  const setRoomInfo = useGameContext().setRoomInfo;
 
   useEffect(() => {
     if (roomInfo?.isLeft) {
       toast(roomInfo.message);
     }
   }, [roomInfo]);
+
+  useEffect(() => {
+    if (reset && roomInfo.players) {
+      roomInfo.players.forEach((player) => (player.points = 0));
+      setRoomInfo(roomInfo);
+    }
+  }, [reset]);
 
   return (
     <div>
