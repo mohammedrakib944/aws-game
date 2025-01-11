@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 
-const PrintName = ({ data }) => {
+const PrintName = ({ data, clearString }) => {
   const [displayString, setDisplayString] = useState("");
+
+  useEffect(() => {
+    setDisplayString("");
+  }, [clearString]);
 
   useEffect(() => {
     if (data) {

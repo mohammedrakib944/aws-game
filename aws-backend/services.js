@@ -9,7 +9,7 @@ import {
 } from "./senders.js";
 
 export const TIMER = 20; // 100 seconds
-export const BREAK_TIME = 10; // seconds
+export const BREAK_TIME = 5; // seconds
 export const TOTAL_LEVEL = 2;
 
 export const getPlayer = (room) => {
@@ -91,7 +91,7 @@ export const startTimer = (io, roomNumber, country, rooms) => {
 
       // Round end
       sendStatus(io, roomNumber, STATUS.SHOW_ANSWER, {
-        answer: `${room.countryName} is the correct answer!`,
+        answer: `"${room.countryName}" is the correct answer!`,
       });
 
       // Update Players
