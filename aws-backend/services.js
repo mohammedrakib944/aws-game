@@ -124,7 +124,8 @@ export const sendRandomCharacter = (io, roomNumber, str) => {
   selectedIndices[initialIndex] = str[initialIndex];
   emittedCount++;
 
-  broadcastCharacters(io, roomNumber, str.length, selectedIndices);
+  // First Character
+  broadcastCharacters(io, roomNumber, str.length, selectedIndices, true);
 
   const interval = setInterval(() => {
     if (emittedCount >= totalCharactersToSend) {

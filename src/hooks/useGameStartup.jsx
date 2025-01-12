@@ -6,10 +6,10 @@ const useGameStartup = () => {
   const setRoomInfo = useGameContext().setRoomInfo;
 
   const [status, setStatus] = useState(null);
-  // const [countrySelector, setCountrySelector] = useState(null);
   const [characters, setCharacters] = useState(null);
   const [hintsReceived, setHintsReceived] = useState(null);
   const [answerReceived, setAnswerReceived] = useState(null);
+  const [newJoin, setNewJoin] = useState(null);
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
@@ -21,9 +21,9 @@ const useGameStartup = () => {
       setRoomInfo(room);
     });
 
-    // socket.on("newRound", (data) => {
-    //   setCountrySelector(data);
-    // });
+    socket.on("newJoin", (message) => {
+      setNewJoin(message);
+    });
 
     socket.on("characters", (data) => {
       setCharacters(data);
@@ -46,6 +46,7 @@ const useGameStartup = () => {
     });
 
     return () => {
+      socket.off("newJoin");
       socket.off("playerList");
       socket.off("characters");
       socket.off("receiveHint");
@@ -61,6 +62,7 @@ const useGameStartup = () => {
     timer,
     status,
     characters,
+    newJoin,
   };
 };
 

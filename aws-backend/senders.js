@@ -13,6 +13,10 @@ export const sendStatus = (io, room_number, status = "", data) => {
   });
 };
 
+export const newJoin = (io, room_number, data) => {
+  io.to(room_number).emit("newJoin", data);
+};
+
 export const sendPlayersOfRoom = (io, room_number, data) => {
   io.to(room_number).emit("playerList", data);
 };
@@ -25,12 +29,14 @@ export const broadcastCharacters = (
   io,
   room_number,
   str_length,
-  selected_indices
+  selected_indices,
+  clear = false
 ) => {
   // countrySelected <- privious
   io.to(room_number).emit("characters", {
     str_len: str_length,
     index: selected_indices,
+    clear,
   });
 };
 

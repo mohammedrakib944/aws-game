@@ -10,6 +10,7 @@ import {
 } from "./services.js";
 import {
   broadcastHints,
+  newJoin,
   sendPlayersOfRoom,
   sendStatus,
   STATUS,
@@ -39,6 +40,11 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", ({ id, username, room_number }, callback) => {
     console.log(username, " Join!");
+
+    newJoin(io, room_number, {
+      message: `${username} - just joined!`,
+    });
+
     if (!rooms[room_number]) {
       rooms[room_number] = {
         players: [],

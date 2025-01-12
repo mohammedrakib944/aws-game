@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 
-const PrintName = ({ data, clearString }) => {
+const PrintName = ({ data }) => {
   const [displayString, setDisplayString] = useState("");
 
   useEffect(() => {
-    console.log("Data: ", data);
+    if (data?.clear) setDisplayString("");
+
     if (data) {
       const { str_len, index } = data;
 
@@ -23,10 +24,6 @@ const PrintName = ({ data, clearString }) => {
       setDisplayString(updatedString.join(""));
     }
   }, [data, displayString]);
-
-  useEffect(() => {
-    if (clearString) setDisplayString("");
-  }, [clearString]);
 
   return (
     <div className="text-3xl font-semibold">

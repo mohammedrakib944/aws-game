@@ -11,6 +11,13 @@ import Button from "../components/button";
 import Modal from "../sections/modal";
 import { useGameContext } from "../context/game-context";
 import PrintName from "./game/PrintName";
+import { playSound } from "../utils/helper";
+import toast from "react-hot-toast";
+
+import roundStartAudio from "../assets/round-start.wav";
+import gameOverAudio from "../assets/game-over.wav";
+import correctAnswerAudio from "../assets/correct-answer.mp3";
+import newJoinAudio from "../assets/new-join.mp3";
 
 const STATUS = {
   START_GAME: "not-started", // {admin, admin_id, message}
@@ -30,7 +37,7 @@ const Game = () => {
   const userInfo = useGameContext().userInfo;
   const roomInfo = useGameContext().roomInfo;
   const location = useGameContext().location;
-  const { hintsReceived, answerReceived, timer, status, characters } =
+  const { hintsReceived, answerReceived, timer, status, characters, newJoin } =
     useGameStartup();
 
   const handleStartGame = () => {
@@ -56,6 +63,13 @@ const Game = () => {
   }, [navigate]);
 
   useEffect(() => {
+    if (newJoin) {
+      playSound(newJoinAudio);
+      toast.success(newJoin.message);
+    }
+  }, [newJoin]);
+
+  useEffect(() => {
     if (status?.status === STATUS.CHOOSING) {
       const data = status.data;
       if (data?.user_id === userInfo.id) {
@@ -67,9 +81,17 @@ const Game = () => {
     }
 
     if (status?.status === STATUS.SHOW_ANSWER) {
+      playSound(correctAnswerAudio);
       setShowAnswer(status?.data.answer);
     } else {
       setShowAnswer(null);
+    }
+
+    if (status?.status === STATUS.GAME_OVER) {
+      playSound(gameOverAudio);
+    }
+    if (status?.status === STATUS.ROUND_START) {
+      playSound(roundStartAudio);
     }
   }, [status, userInfo]);
 
@@ -186,17 +208,7 @@ const Game = () => {
             <span className="text-blue-600 text-2xl font-bold">{timer}</span>
           </h1>
 
-          <h1>
-            {characters && (
-              <PrintName
-                clearString={
-                  status?.status === STATUS.SHOW_ANSWER ||
-                  status?.status === STATUS.GAME_OVER
-                }
-                data={characters}
-              />
-            )}
-          </h1>
+          <h1>{characters && <PrintName data={characters} />}</h1>
           <h1 className="text-xl">
             <span className="text-base font-semibold">Share this code</span>{" "}
             <span className="font-semibold text-blue-600">{room_number}</span>
