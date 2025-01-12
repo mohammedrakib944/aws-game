@@ -8,7 +8,7 @@ import {
   STATUS,
 } from "./senders.js";
 
-export const TIMER = 90; // 90 seconds
+export const TIMER = 60; // 60 seconds
 export const BREAK_TIME = 5; // seconds
 export const TOTAL_LEVEL = 3;
 
@@ -39,19 +39,15 @@ export const sortPlayersByPoints = (players) => {
 export const startNewRound = (io, rooms, room_number) => {
   const room = rooms[room_number];
 
-  console.log("Start round 1");
   if (!room || room.players.length === 0) return;
 
   // Clear all points
   room.correctAnswers = {};
-  console.log("Start round 2");
   // Select the next player in sequence
   const player = getPlayer(room);
 
-  console.log("Start round 3");
   if (player?.status === "all-player-done") {
     //Handle Game Over
-    console.log("Game is over!");
     const players_list = sortPlayersByPoints(room.players);
     sendStatus(io, room_number, STATUS.GAME_OVER, {
       points: players_list,

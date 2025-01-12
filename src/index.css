@@ -13,13 +13,14 @@
   }
 
   .blur-bg {
-    @apply bg-white/40 border backdrop-blur-xl rounded-lg;
+    @apply bg-white/70 border backdrop-blur-xl rounded-lg;
   }
 }
 
 .background {
   background: url("/src/assets/background.svg") center no-repeat fixed;
   background-size: cover;
+  overflow: hidden;
 }
 
 .ol-attribution.ol-unselectable.ol-control.ol-uncollapsible {

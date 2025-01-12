@@ -18,13 +18,14 @@ import roundStartAudio from "../assets/round-start.wav";
 import gameOverAudio from "../assets/game-over.wav";
 import correctAnswerAudio from "../assets/correct-answer.mp3";
 import newJoinAudio from "../assets/new-join.mp3";
+import birdGif from "../assets/bird.gif";
 
 export const STATUS = {
-  START_GAME: "not-started", // {admin, admin_id, message}
-  CHOOSING: "choosing", // {message, user_id} -> see the modal to owner, other messsage
-  ROUND_START: "round-start", // see the hints and message box
-  SHOW_ANSWER: "show-answer", // {answer} show the answeer
-  GAME_OVER: "game-over", // { points: players_list } all player points
+  START_GAME: "not-started",
+  CHOOSING: "choosing",
+  ROUND_START: "round-start",
+  SHOW_ANSWER: "show-answer",
+  GAME_OVER: "game-over",
 };
 
 const Game = () => {
@@ -211,6 +212,11 @@ const Game = () => {
     <div>
       <Modal showMap={showMap} handleSelectCountry={handleSelectCountry} />
       <Navbar name={userInfo?.username} />
+
+      <img
+        src={birdGif}
+        className="w-[100px] absolute top-3 transform -translate-y-1/2 animate-fly"
+      />
 
       <div className="system-width">
         <div className="flex items-end justify-between pt-4 pb-3">

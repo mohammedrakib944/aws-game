@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import { socket } from "../hooks/base";
 import { useGameContext } from "../context/game-context";
 import { v4 as uuidv4 } from "uuid";
+import birdGif from "../assets/bird.gif";
 
 const RoomType = {
   CREATE: "create",
@@ -65,6 +66,10 @@ const Home = () => {
 
   return (
     <>
+      <img
+        src={birdGif}
+        className="w-[100px] absolute top-[100px] transform -translate-y-1/2 animate-fly"
+      />
       <Navbar />
       <div className="w-full h-[calc(100vh-70px)] flex items-center justify-center">
         <div className="px-10 py-5 blur-bg">

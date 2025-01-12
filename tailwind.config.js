@@ -7,6 +7,15 @@ export default {
         primary: "#397586",
         font: "#163341",
       },
+      keyframes: {
+        fly: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(calc(100vw + 100px))" },
+        },
+      },
+      animation: {
+        fly: "fly 15s linear infinite",
+      },
     },
   },
   plugins: [],
