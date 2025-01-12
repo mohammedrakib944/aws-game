@@ -19,7 +19,7 @@ import gameOverAudio from "../assets/game-over.wav";
 import correctAnswerAudio from "../assets/correct-answer.mp3";
 import newJoinAudio from "../assets/new-join.mp3";
 
-const STATUS = {
+export const STATUS = {
   START_GAME: "not-started", // {admin, admin_id, message}
   CHOOSING: "choosing", // {message, user_id} -> see the modal to owner, other messsage
   ROUND_START: "round-start", // see the hints and message box
@@ -34,9 +34,11 @@ const Game = () => {
   const room_number = searchParams.get("room");
   const [isPlaying, setIsPlaying] = useState(false);
   const [showAnswer, setShowAnswer] = useState(null);
+  const [shouldReset, setShouldReset] = useState(false);
   const userInfo = useGameContext().userInfo;
   const roomInfo = useGameContext().roomInfo;
   const location = useGameContext().location;
+  const setLocation = useGameContext().setLocation;
   const { hintsReceived, answerReceived, timer, status, characters, newJoin } =
     useGameStartup();
 
@@ -56,7 +58,16 @@ const Game = () => {
       user_id: userInfo?.id,
     });
     setShowMap(false);
+    setLocation("");
   };
+
+  useEffect(() => {
+    if (characters?.clear) {
+      setShouldReset(true);
+    } else {
+      setShouldReset(false);
+    }
+  }, [characters]);
 
   useEffect(() => {
     if (!socket.connected) navigate("/");
@@ -131,13 +142,13 @@ const Game = () => {
         <Hints
           room_number={room_number}
           isOwner={isPlaying}
-          reset={status?.status === STATUS.SHOW_ANSWER}
+          reset={shouldReset}
           hintsReceived={hintsReceived}
         />
         <Answers
           room_number={room_number}
           isOwner={isPlaying}
-          reset={status?.status === STATUS.SHOW_ANSWER}
+          reset={shouldReset}
           answerReceived={answerReceived}
           userInfo={userInfo}
         />
@@ -208,14 +219,18 @@ const Game = () => {
             <span className="text-blue-600 text-2xl font-bold">{timer}</span>
           </h1>
 
-          <h1>{characters && <PrintName data={characters} />}</h1>
+          <h1>
+            {characters && (
+              <PrintName data={characters} status={status?.status} />
+            )}
+          </h1>
           <h1 className="text-xl">
             <span className="text-base font-semibold">Share this code</span>{" "}
             <span className="font-semibold text-blue-600">{room_number}</span>
           </h1>
         </div>
 
-        <div className="border rounded-lg shadow-xl flex gap-2 lg:gap-4 px-2 lg:px-5 py-4 relative">
+        <div className="bg-white border-2 border-black/20 rounded-lg shadow-xl flex gap-2 lg:gap-4 px-2 lg:px-5 py-4 relative">
           {status?.status === STATUS.CHOOSING &&
             status?.data?.user_id !== userInfo.id && (
               <div className="absolute w-full h-full top-0 left-0 bg-sky-600/70 backdrop-blur-sm rounded-lg flex items-center justify-center">

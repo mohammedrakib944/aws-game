@@ -66,13 +66,15 @@ const Home = () => {
   return (
     <>
       <Navbar />
-      <div className="w-full h-[calc(100vh-50px)] flex items-center justify-center">
-        <div>
+      <div className="w-full h-[calc(100vh-70px)] flex items-center justify-center">
+        <div className="px-10 py-5 blur-bg">
           <div className="text-center pb-3">
-            <h1 className="text-5xl font-bold pb-2">Hide and Seek</h1>
-            <h2 className="text-3xl font-semibold text-gray-600">
-              {roomType === RoomType.CREATE ? "Create" : "Join"} Game
-            </h2>
+            <h1 className="text-5xl font-bold pb-2">
+              Hide and Seek{" "}
+              <span className="text-xs">
+                {roomType === RoomType.CREATE ? "Create" : "Join"}{" "}
+              </span>
+            </h1>
           </div>
           <form
             action=""

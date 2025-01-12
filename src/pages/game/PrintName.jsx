@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { STATUS } from "../Game";
 
-const PrintName = ({ data }) => {
+const PrintName = ({ data, status }) => {
   const [displayString, setDisplayString] = useState("");
 
   useEffect(() => {
-    if (data?.clear) setDisplayString("");
+    if (data?.clear || status === STATUS.GAME_OVER) setDisplayString("");
 
     if (data) {
       const { str_len, index } = data;
@@ -23,11 +24,11 @@ const PrintName = ({ data }) => {
 
       setDisplayString(updatedString.join(""));
     }
-  }, [data, displayString]);
+  }, [data, displayString, status]);
 
   return (
     <div className="text-3xl font-semibold">
-      <span className="text-gray-500"></span> {displayString}
+      {status === STATUS.GAME_OVER ? "" : <>{displayString}</>}
     </div>
   );
 };

@@ -5,7 +5,6 @@ const App = () => {
   if (socket.connected) socket.disconnect();
   return (
     <div>
-      <h2>Awesome</h2>
       <Home />
     </div>
   );

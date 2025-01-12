@@ -8,9 +8,9 @@ import {
   STATUS,
 } from "./senders.js";
 
-export const TIMER = 20; // 100 seconds
+export const TIMER = 90; // 90 seconds
 export const BREAK_TIME = 5; // seconds
-export const TOTAL_LEVEL = 1;
+export const TOTAL_LEVEL = 3;
 
 export const getPlayer = (room) => {
   const nextPlayer = room.players.find(
