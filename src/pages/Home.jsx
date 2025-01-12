@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router";
 import { generateUniqueNumber } from "../utils/helper";
 import Navbar from "../components/Navbar";
+import Logo from "../assets/Logo.svg";
 
 import { socket } from "../hooks/base";
 import { useGameContext } from "../context/game-context";
@@ -74,12 +75,12 @@ const Home = () => {
       <div className="w-full h-[calc(100vh-70px)] flex items-center justify-center">
         <div className="px-10 py-5 blur-bg">
           <div className="text-center pb-3">
-            <h1 className="text-5xl font-bold pb-2">
-              Hide and Seek{" "}
-              <span className="text-xs">
+            <div className="flex items-end gap-2 justify-center">
+              <img src={Logo} className="w-[250px]" />
+              <span className="text-sm -mb-0.5">
                 {roomType === RoomType.CREATE ? "Create" : "Join"}{" "}
               </span>
-            </h1>
+            </div>
           </div>
           <form
             action=""
